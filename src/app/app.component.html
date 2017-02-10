@@ -1,3 +1,24 @@
-<h1>
-  {{title}}
-</h1>
+<button id="menu-top-left"
+        class="mdl-button mdl-js-button mdl-button--icon hideme" *ngIf="showButton">
+  <i class="material-icons">☰</i>
+</button>
+
+<ul class="mdl-list" class="mdl-menu mdl-menu--bottom-left mdl-js-menu mdl-js-ripple-effect" for="menu-top-left" >
+    <li class="mdl-menu__item" *ngFor="let layer of layers">
+        <span class="mdl-list__item-primary-content">
+            <i class="material-icons  mdl-list__item-avatar">☺</i>
+            {{layer.name}}
+        </span>
+        <span class="mdl-list__item-secondary-action" data-mdl-for="demo-menu-top-left" data-mdl-for="menu-top-left">
+            <label class="mdl-switch mdl-js-switch mdl-js-ripple-effect">
+                <input type="checkbox" id="layer-switches" 
+                class="mdl-switch__input" 
+                [checked]=layer.enabled 
+                (click)=toggleLayer(layer.name)
+                />
+            </label>
+        </span>
+    </li>
+</ul>    
+
+<canvas id="canvas" class="canvas" #canvas ></canvas>
