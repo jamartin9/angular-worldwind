@@ -11,6 +11,7 @@ declare var WorldWind:any;
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
 })
+
 export class AppComponent implements OnInit{
   // worldwindweb canvas
   @ViewChild('canvas') canvas;
@@ -25,6 +26,7 @@ export class AppComponent implements OnInit{
   public showMenu(){this.showButton = true;}
   public hideMenu(){this.showButton = false;}
   public getCanvas(){return this.canvas.nativeElement};
+
 /**
  * Toggles the layer on UI by name, updates components internal layers state
  * Optional: redraw, defaults: true
