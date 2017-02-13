@@ -145,7 +145,7 @@ export class WorldwindComponent implements OnInit {
 
   ngOnInit() {
     // TODO: assign to env var to be configurable from cli 
-    //WorldWind.configuration.baseUrl = 'angular-cesium/';
+    WorldWind.configuration.baseUrl = '';
     // create worldwind
     let wwd = new WorldWind.WorldWindow('canvas');
     this.worldwind = wwd;
