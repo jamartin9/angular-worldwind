@@ -144,6 +144,8 @@ export class WorldwindComponent implements OnInit {
   }
 
   ngOnInit() {
+    // TODO: assign to env var to be configurable from cli 
+    WorldWind.configuration.baseUrl = 'angular-cesium/';
     // create worldwind
     let wwd = new WorldWind.WorldWindow('canvas');
     this.worldwind = wwd;
@@ -437,8 +439,6 @@ export class WorldwindComponent implements OnInit {
     // Configure the logging level.
     WorldWind.Logger.setLoggingLevel(WorldWind.Logger.LEVEL_WARNING);
 
-    // Configure the amount of GPU memory to use.
-    WorldWind.configuration.gpuCacheSize = 500e6; // 500 MB
   }
 
 }
