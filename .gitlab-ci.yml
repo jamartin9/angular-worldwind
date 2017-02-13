@@ -8,5 +8,8 @@ pages:
   artifacts:
     paths:
     - public
+    - public/images
+    - public/images/view
+    - public/assets
   only:
   - master
