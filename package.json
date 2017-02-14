@@ -45,5 +45,7 @@
     "tslint": "^4.3.0",
     "typescript": "~2.0.3"
   },
-  "author": "Justin <DoNotEmailMe@email.com>"
+  "author": "Justin <DoNotEmailMe@email.com>",
+  "main": "index.js",
+  "repository": "git@gitlab.com:spaz/angular-cesium.git"
 }
