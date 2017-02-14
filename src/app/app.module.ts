@@ -10,7 +10,7 @@ import { WorldwindComponent } from './worldwind/worldwind.component';
 
 // routes needed for primeng
 const appRoutes: Routes = [
-  { path: '**', component: WorldwindComponent }
+  { path: '', component: WorldwindComponent }
 ];
 
 @NgModule({
