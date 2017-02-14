@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { MenuItem, Message } from 'primeng/primeng';
 // need typings
 declare var WorldWind: any;
@@ -13,10 +13,10 @@ declare var WorldWind: any;
   templateUrl: './worldwind.component.html',
   styleUrls: ['./worldwind.component.css']
 })
-export class WorldwindComponent implements OnInit {
+export class WorldwindComponent {
 
   // worldwindweb canvas
-  @ViewChild('canvas') canvas;
+  @ViewChild('canvas') canvas:ElementRef;
 
   // worlding window
   private worldwind: any;
@@ -149,7 +149,6 @@ export class WorldwindComponent implements OnInit {
     // create worldwind
     let wwd = new WorldWind.WorldWindow('canvas');
     this.worldwind = wwd;
-
     let highlighter = new WorldWind.HighlightController(wwd);
 
     // The common gesture-handling function.

@@ -2,23 +2,11 @@
   position: absolute;
   height: 100%;
   width: 100%;
-  margin: 0;
-  overflow: hidden;
   padding: 0;
   font-family: FontAwesome;
   background:#000 url('assets/stars.png') repeat top center;
   z-index:0;
   display: flex;
-}
-
-#menubar {
-  display: flex;
-  background: black;
-
-}
-
-#messages {
-    display: flex;
 }
 
 @keyframes move-twink-back {
@@ -38,15 +26,7 @@
     to {background-position:-10000px 5000px;}
 }
 
-.stars {
-  background:#000 url('assets/stars.png') repeat top center;
-  z-index:0;
-}
-
-.twinkling{
-  background:transparent url('assets/twinkling.png') repeat top center;
-  z-index:1;
-
+.animation{
   -moz-animation:move-twink-back 200s linear infinite;
   -ms-animation:move-twink-back 200s linear infinite;
   -o-animation:move-twink-back 200s linear infinite;
