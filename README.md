@@ -26,7 +26,7 @@ Before running the tests make sure you are serving the app via `ng serve`.
 ## Deploying to GitLab Pages
 Replace `GITLAB_USER` and `GITLAB_PROJECT` with the your gitlab username and gitlab project name
 Add the following content in .gitlab-ci.yml
-`
+```
 image: node:latest
 
 pages:
@@ -39,7 +39,7 @@ pages:
     - public
   only:
   - master
-`
+```
 
 Replace `dist` path for `outDir` in `angular-cli.json` and `tsconfig.json` with `public` for gitlab
 
