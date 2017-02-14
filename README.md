@@ -23,9 +23,26 @@ Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.
 Run `ng e2e` to execute the end-to-end tests via [Protractor](http://www.protractortest.org/).
 Before running the tests make sure you are serving the app via `ng serve`.
 
-## Deploying to GitHub Pages
+## Deploying to GitLab Pages
+Replace `GITLAB_USER` and `GITLAB_PROJECT` with the your gitlab username and gitlab project name
+Add the following content in .gitlab-ci.yml
+`
+image: node:latest
 
-Run `ng github-pages:deploy` to deploy to GitHub Pages.
+pages:
+  stage: deploy
+  script:
+  - npm install
+  - node ./node_modules/@angular/cli/bin/ng build --aot=true --environment=prod --sourcemap=false --base-href="https://GITLAB_USER.gitlab.io/GITLAB_PROJECT/"
+  artifacts:
+    paths:
+    - public
+  only:
+  - master
+`
+
+Replace `dist` path for `outDir` in `angular-cli.json` and `tsconfig.json` with `public` for gitlab
+
 
 ## Further help
 
@@ -33,4 +50,14 @@ To get more help on the `angular-cli` use `ng help` or go check out the [Angular
 
 ## Goals
 
-WorldWindWeb angular component with CI
+Reuseable WorldWindWeb Angular 2+ component with automatic CI of the latest libraries and tests
+
+Provide:
+1. Worldwind layer management along with time data about the layer ( ie when shapes occurened )
+2. Highlighting amongst layers with selection of shapes
+3. 3D Drawing tools for point/circle/polygon with cut
+4. Save, Delete, Undo, Redo
+5. DVR Controls for layers
+6. Import of KML/GeoJSON/Internal formats
+7. Streaming of data through WebSockets/KML_NETWORK_LINKS/ProvidedProducers
+8. Controls for the above functionality
