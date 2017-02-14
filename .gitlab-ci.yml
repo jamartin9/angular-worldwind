@@ -4,7 +4,7 @@ pages:
   stage: deploy
   script:
   - npm install
-  - npm run ng build --aot=true --environment=prod --sourcemap=false --base-href="https://spaz.gitlab.io/angular-cesium/"
+  - node ./node_modules/@angular/cli/bin/ng build --aot=true --environment=prod --sourcemap=false --base-href="https://spaz.gitlab.io/angular-cesium/"
   artifacts:
     paths:
     - public
