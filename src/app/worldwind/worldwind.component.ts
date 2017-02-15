@@ -54,6 +54,7 @@ export class WorldwindComponent {
               for (let item = 0; item < this.menuLayers[menuitem].items.length; item++) {
                 if (name === this.menuLayers[menuitem].items[item].label) {
                   this.menuLayers[menuitem].items[item].icon = 'fa-toggle-off';
+                  return;
                 }
               }
             }
@@ -72,6 +73,7 @@ export class WorldwindComponent {
               for (let item = 0; item < this.menuLayers[menuitem].items.length; item++) {
                 if (name === this.menuLayers[menuitem].items[item].label) {
                   this.menuLayers[menuitem].items[item].icon = 'fa-toggle-on';
+                  return;
                 }
               }
             }
@@ -90,7 +92,8 @@ export class WorldwindComponent {
     let exists = false;
     for (let i = 0; i < this.layers.length; i++) {
       if (name === this.layers[i].label) {
-        exists = true;
+        // return as layer already exists
+        return;
       }
     }
     if (!exists) {
@@ -107,6 +110,7 @@ export class WorldwindComponent {
               this.toggleLayer(event.item.label);
             }
           });
+          return;
         }
       }
     }
@@ -126,6 +130,7 @@ export class WorldwindComponent {
             for (let item = 0; item < this.menuLayers[menuitem].items.length; item++) {
               if (name === this.menuLayers[menuitem].items[item].label) {
                 this.menuLayers[menuitem].items.splice(item, 1);
+                return;
               }
             }
           }
