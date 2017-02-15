@@ -16,7 +16,7 @@ declare var WorldWind: any;
 export class WorldwindComponent {
 
   // worldwindweb canvas
-  @ViewChild('canvas') canvas:ElementRef;
+  @ViewChild('canvas') canvas: ElementRef;
 
   // worlding window
   private worldwind: any;
@@ -243,8 +243,9 @@ export class WorldwindComponent {
             // TODO: implement plus/builder for custom layers
             // optional added layers from remote sources
             { label: 'KML' },
-            {label: 'BingAerial',
-             command: (event) =>{
+            {
+              label: 'BingAerial',
+              command: (event) => {
                 this.addLayer(new WorldWind.BingAerialWithLabelsLayer(null), "BingAerial");
               }
             },
@@ -364,6 +365,7 @@ export class WorldwindComponent {
               } else {
                 this.menuLayers[menuitem].icon = 'fa-play-circle';
               }
+              return;
             }
           }
         }
@@ -380,6 +382,7 @@ export class WorldwindComponent {
               } else {
                 this.menuLayers[menuitem].icon = 'fa-circle';
               }
+              return;
             }
           }
         }
