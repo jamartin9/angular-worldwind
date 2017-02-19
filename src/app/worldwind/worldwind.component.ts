@@ -1,47 +1,32 @@
 import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { MenuItem, Message } from 'primeng/primeng';
-// need typings
-declare var WorldWind: any;
-/** TODO: cordinate manager, data feed
- * Started: highlighting, Highlighting is intended to be customized through the selector to combine select items into a seperate layer
- *          menu controls, Menu controls are a WIP
- *          drawing tools, The drawing tools are intended to provide point/circle, polygons and cut for holes. Note: needs worth with highligher/selector for combining through layers
- *          Layer Manager, The layer manager is intended to a worldwind layer plus additional data such as time series informatin about the data contained within
- */
+
+// TODO: need typings
+declare let WorldWind: any;
+
 @Component({
   selector: 'app-worldwind',
   templateUrl: './worldwind.component.html',
   styleUrls: ['./worldwind.component.css']
 })
 export class WorldwindComponent {
-
-  // worldwindweb canvas
   @ViewChild('canvas') canvas: ElementRef;
-
-  // worlding window
   private worldwind: any;
-
-  // messages
   private msgs: Message[] = [];
-
-  // layers list for layermanager
   private menuLayers: MenuItem[];
-
-  // TODO: remove label and use layer displayName?
-  private layers: [{ layer: any, label: string }];
-
+  private layers: [{ layer: any, timeData?: any }];
   constructor() { }
-
   public getWorldWind() { return this.worldwind; }
   public getCanvas() { return this.canvas.nativeElement; }
+  public addMessage(message: Message) { this.msgs.push(message); }
 
   /**
-   * Toggles the layer on UI by name, updates components internal layers state
+   * Toggles the layer by name
    * Optional: redraw, defaults: true
    */
   public toggleLayer(name: string, redraw = true) {
     for (let l = 0; l < this.layers.length; l++) {
-      if (name === this.layers[l].label) {
+      if (name === this.layers[l].layer.displayName) {
         if (this.layers[l].layer.enabled) {
           // turn off layer
           this.worldwind.removeLayer(this.layers[l].layer);
@@ -85,26 +70,26 @@ export class WorldwindComponent {
   }
 
   /**
-   * Add WorldWind Layer with name. No collisions
+   * Add Worldwind Layer. No collisions
    * Optional: redraw, defaults: true
+   *          timeData, defaults:null
    */
-  public addLayer(layer: any, name: string, redraw = true) {
+  public addLayer(layer: any, redraw = true, timeData?: any) {
     let exists = false;
     for (let i = 0; i < this.layers.length; i++) {
-      if (name === this.layers[i].label) {
-        // return as layer already exists
+      if (layer.displayName === this.layers[i].layer.displayName) {
         return;
       }
     }
     if (!exists) {
       let enabled = layer.enabled;
       this.worldwind.addLayer(layer);
-      this.layers.push({ layer, label: name });
+      this.layers.push({ layer });
       this.redraw(redraw);
       for (let menuitem = 0; menuitem < this.menuLayers.length; menuitem++) {
         if (this.menuLayers[menuitem].label == 'Layers') {
           this.menuLayers[menuitem].items.push({
-            label: name,
+            label: layer.displayName,
             icon: 'fa-toggle-on',
             command: (event) => {
               this.toggleLayer(event.item.label);
@@ -122,7 +107,7 @@ export class WorldwindComponent {
    */
   public removeLayer(name: string, redraw = true) {
     for (let l = 0; l < this.layers.length; l++) {
-      if (name === this.layers[l].label) {
+      if (name === this.layers[l].layer.displayName) {
         this.worldwind.removeLayer(this.layers[l].layer);
         this.redraw(redraw);
         for (let menuitem = 0; menuitem < this.menuLayers.length; menuitem++) {
@@ -140,7 +125,9 @@ export class WorldwindComponent {
   }
 
   /**
-   * private redraw so control is exposed on per function basis via optional param(s) with common call interface intenally
+   * private redraw 
+   * control is exposed on per function basis via optional param(s)
+   * keeps common call interface intenally for worldwind
    */
   private redraw(redraw: boolean) {
     if (redraw) {
@@ -149,8 +136,9 @@ export class WorldwindComponent {
   }
 
   ngOnInit() {
-    // TODO: assign to env var to be configurable from cli 
+    // TODO: assign to env let to be configurable from cli 
     WorldWind.configuration.baseUrl = '';
+
     // create worldwind
     let wwd = new WorldWind.WorldWindow('canvas');
     this.worldwind = wwd;
@@ -231,7 +219,6 @@ export class WorldwindComponent {
     // Listen for taps on mobile devices and highlight the placemarks that the user taps.
     let tapRecognizer = new WorldWind.TapRecognizer(wwd, handlePick);
 
-
     this.menuLayers = [
       {
         label: 'Layers',
@@ -246,7 +233,7 @@ export class WorldwindComponent {
             {
               label: 'BingAerial',
               command: (event) => {
-                this.addLayer(new WorldWind.BingAerialWithLabelsLayer(null), "BingAerial");
+                this.addLayer(new WorldWind.BingAerialWithLabelsLayer(null));
               }
             },
             // custom polygon layer
@@ -256,7 +243,7 @@ export class WorldwindComponent {
                 // Create a layer to hold the polygons.
                 let polygonsLayer = new WorldWind.RenderableLayer();
                 polygonsLayer.displayName = "Polygons";
-                this.addLayer(polygonsLayer, "Polygons");
+                this.addLayer(polygonsLayer);
 
                 // Define an outer and an inner boundary to make a polygon with a hole.
                 let boundaries = [];
@@ -299,21 +286,21 @@ export class WorldwindComponent {
         },
         // default layers
         {
-          label: 'Base',
+          label: 'Blue Marble',
           icon: 'fa-toggle-off',
           command: (event) => {
             this.toggleLayer(event.item.label);
           }
         },
         {
-          label: 'OneImage',
+          label: 'Blue Marble Image',
           icon: 'fa-toggle-on',
           command: (event) => {
             this.toggleLayer(event.item.label);
           }
         },
         {
-          label: 'LandSat',
+          label: 'Blue Marble & Landsat',
           icon: 'fa-toggle-off',
           command: (event) => {
             this.toggleLayer(event.item.label);
@@ -327,14 +314,14 @@ export class WorldwindComponent {
           }
         },
         {
-          label: 'Cordinates',
+          label: 'Coordinates',
           icon: 'fa-cog fa-spin fa-fw',
           command: (event) => {
             this.toggleLayer(event.item.label);
           }
         },
         {
-          label: 'ViewControls',
+          label: 'View Controls',
           icon: 'fa-cog fa-spin fa-fw',
           command: (event) => {
             this.toggleLayer(event.item.label);
@@ -350,7 +337,7 @@ export class WorldwindComponent {
           { label: 'Undo', icon: 'fa-mail-forward' },
           { label: 'Redo', icon: 'fa-mail-reply' },
           { label: 'Delete', icon: 'fa-times-circle' },
-          { label: 'Save', icon: 'fa-floppy-o', command: (event) => { this.msgs.push({ severity: 'success', summary: 'Success Message', detail: '!' }); } }
+          { label: 'Save', icon: 'fa-floppy-o', command: (event) => { this.addMessage({ severity: 'success', summary: 'Success Message', detail: '!' }); } }
         ]
       },
       {
@@ -358,7 +345,7 @@ export class WorldwindComponent {
         label: 'Play',
         icon: 'fa-play-circle',
         command: (event) => {
-          for (var menuitem = 0; menuitem < this.menuLayers.length; menuitem++) {
+          for (let menuitem = 0; menuitem < this.menuLayers.length; menuitem++) {
             if ('Play' === this.menuLayers[menuitem].label) {
               if ('fa-play-circle' === this.menuLayers[menuitem].icon) {
                 this.menuLayers[menuitem].icon = 'fa-pause';
@@ -375,7 +362,7 @@ export class WorldwindComponent {
         label: 'Record',
         icon: 'fa-circle',
         command: (event) => {
-          for (var menuitem = 0; menuitem < this.menuLayers.length; menuitem++) {
+          for (let menuitem = 0; menuitem < this.menuLayers.length; menuitem++) {
             if ('Record' === this.menuLayers[menuitem].label) {
               if ('fa-circle' === this.menuLayers[menuitem].icon) {
                 this.menuLayers[menuitem].icon = 'fa-spinner fa-pulse fa-fw';
@@ -423,19 +410,19 @@ export class WorldwindComponent {
 
     // add default set of layers
     this.layers = [
-      { layer: new WorldWind.BMNGLayer(), label: "Base" },
-      { layer: new WorldWind.BMNGOneImageLayer(), label: "OneImage" },
-      { layer: new WorldWind.BMNGLandsatLayer(), label: "LandSat" },
-      { layer: new WorldWind.CompassLayer(), label: "Compass" },
-      { layer: new WorldWind.CoordinatesDisplayLayer(this.worldwind), label: "Cordinates" },
-      { layer: new WorldWind.ViewControlsLayer(this.worldwind), label: "ViewControls" }
+      { layer: new WorldWind.BMNGLayer() },
+      { layer: new WorldWind.BMNGOneImageLayer() },
+      { layer: new WorldWind.BMNGLandsatLayer() },
+      { layer: new WorldWind.CompassLayer() },
+      { layer: new WorldWind.CoordinatesDisplayLayer(this.worldwind) },
+      { layer: new WorldWind.ViewControlsLayer(this.worldwind) }
     ];
 
     // init layers info
     for (let l = 0; l < this.layers.length; l++) {
-      if ("OneImage" === this.layers[l].label
-        || "Cordinates" === this.layers[l].label
-        || "ViewControls" === this.layers[l].label) {
+      if ("Blue Marble Image" === this.layers[l].layer.displayName
+        || "Coordinates" === this.layers[l].layer.displayName
+        || "View Controls" === this.layers[l].layer.displayName) {
         this.layers[l].layer.enabled = true;
       } else {
         this.layers[l].layer.enabled = false;
