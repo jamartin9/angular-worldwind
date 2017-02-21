@@ -11,6 +11,8 @@ declare let WorldWind: any;
 })
 export class WorldwindComponent {
   @ViewChild('canvas') canvas: ElementRef;
+  private displayTextInput: boolean = false;
+  private nameInput: string;
   private worldwind: any;
   private msgs: Message[] = [];
   private menuLayers: MenuItem[];
@@ -70,15 +72,18 @@ export class WorldwindComponent {
   }
 
   /**
-   * Add Worldwind Layer. No collisions
+   * Add Worldwind Layer. 
    * Optional: redraw, defaults: true
    *          timeData, defaults:null
+   *          overwrite, defaults: false
    */
-  public addLayer(layer: any, redraw = true, timeData?: any) {
+  public addLayer(layer: any, timeData?: any, overwrite = false, redraw = true) {
     let exists = false;
-    for (let i = 0; i < this.layers.length; i++) {
-      if (layer.displayName === this.layers[i].layer.displayName) {
-        return;
+    if (!overwrite) {
+      for (let i = 0; i < this.layers.length; i++) {
+        if (layer.displayName === this.layers[i].layer.displayName) {
+          return;
+        }
       }
     }
     if (!exists) {
@@ -132,6 +137,24 @@ export class WorldwindComponent {
   private redraw(redraw: boolean) {
     if (redraw) {
       this.worldwind.redraw();
+    }
+  }
+
+  /**
+   * Toggels dialog for text input
+   * Adds Worldwind layer with name from input
+   */
+  private toggleDialog() {
+    if (this.displayTextInput) {
+      this.displayTextInput = false;
+      if (this.nameInput) {
+        let userLayer = new WorldWind.RenderableLayer();
+        userLayer.displayName = this.nameInput;
+        this.addLayer(userLayer);
+        this.nameInput = "";
+      }
+    } else {
+      this.displayTextInput = true;
     }
   }
 
@@ -227,19 +250,10 @@ export class WorldwindComponent {
           label: 'New',
           icon: 'fa-plus',
           items: [
-            // TODO: implement plus/builder for custom layers
             // optional added layers from remote sources
-            { label: 'KML' },
             {
-              label: 'BingAerial',
-              command: (event) => {
-                this.addLayer(new WorldWind.BingAerialWithLabelsLayer(null));
-              }
-            },
-            // custom polygon layer
-            {
-              label: 'Other',
-              command: (event) => {
+              label: 'KML',
+              command: () => {
                 // Create a layer to hold the polygons.
                 let polygonsLayer = new WorldWind.RenderableLayer();
                 polygonsLayer.displayName = "Polygons";
@@ -279,6 +293,19 @@ export class WorldwindComponent {
 
                 // Add the polygon to the layer and the layer to the World Window's layer list.
                 polygonsLayer.addRenderable(polygon);
+              }
+            },
+            {
+              label: 'BingAerial',
+              command: (event) => {
+                this.addLayer(new WorldWind.BingAerialWithLabelsLayer(null));
+              }
+            },
+            {
+              label: 'Other',
+              command: (event) => {
+                // show user input for name
+                this.toggleDialog();
 
               }
             }
@@ -334,10 +361,10 @@ export class WorldwindComponent {
         icon: 'fa-edit',
         items: [
           // TODO: undo/redo/delete/save
-          { label: 'Undo', icon: 'fa-mail-forward' },
-          { label: 'Redo', icon: 'fa-mail-reply' },
-          { label: 'Delete', icon: 'fa-times-circle' },
-          { label: 'Save', icon: 'fa-floppy-o', command: (event) => { this.addMessage({ severity: 'success', summary: 'Success Message', detail: '!' }); } }
+          { label: 'Undo', icon: 'fa-mail-forward', command: (event) => { this.addMessage({ severity: 'warn', summary: 'Undo Message', detail: '!' }); } },
+          { label: 'Redo', icon: 'fa-mail-reply', command: (event) => { this.addMessage({ severity: 'info', summary: 'Redo Message', detail: '!' }); } },
+          { label: 'Delete', icon: 'fa-times-circle', command: (event) => { this.addMessage({ severity: 'error', summary: 'Delete Message', detail: '!' }); } },
+          { label: 'Save', icon: 'fa-floppy-o', command: (event) => { this.addMessage({ severity: 'success', summary: 'Save Message', detail: '!' }); } }
         ]
       },
       {

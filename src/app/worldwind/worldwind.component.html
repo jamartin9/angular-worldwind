@@ -1,4 +1,9 @@
 <p-menubar [model]="menuLayers"></p-menubar>
+<p-dialog header="Name" [(visible)]="displayTextInput">
+    <input type="text" [(ngModel)]="nameInput" pInputText />
+    <button pButton label="Save" icon="fa-check" (click)="toggleDialog()" iconPos="left"></button>
+</p-dialog>
 <canvas id="canvas" class="animation" #canvas >   
 </canvas>
-<p-messages [value]="msgs"></p-messages>
+<p-growl [value]="msgs"></p-growl>
+<p-blockUI [blocked]="displayTextInput" ></p-blockUI>
