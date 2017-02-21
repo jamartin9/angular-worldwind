@@ -385,7 +385,7 @@ export class WorldwindComponent {
         }
       },
       {
-        // TODO: record, inteded for recording from remote feed into layer for later consumption (may involve adding timing data to geo data)
+        // TODO: record, inteded for recording from feed into layer for later consumption
         label: 'Record',
         icon: 'fa-circle',
         command: (event) => {
