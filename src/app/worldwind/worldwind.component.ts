@@ -16,24 +16,19 @@ export class WorldwindComponent {
   private worldwind: any;
   private msgs: Message[] = [];
   private menuLayers: MenuItem[];
-  private layers: [{ layer: any, timeData?: any }];
   constructor() { }
   public getWorldWind() { return this.worldwind; }
   public getCanvas() { return this.canvas.nativeElement; }
   public addMessage(message: Message) { this.msgs.push(message); }
 
   /**
-   * Toggles the layer by name
-   * Optional: redraw, defaults: true
+   * Toggles layer by name
    */
   public toggleLayer(name: string, redraw = true) {
-    for (let l = 0; l < this.layers.length; l++) {
-      if (name === this.layers[l].layer.displayName) {
-        if (this.layers[l].layer.enabled) {
-          // turn off layer
-          this.worldwind.removeLayer(this.layers[l].layer);
-          this.layers[l].layer.enabled = false;
-          this.worldwind.addLayer(this.layers[l].layer);
+    for (let l = 0; l < this.worldwind.layers.length; l++) {
+      if (name === this.worldwind.layers[l].displayName) {
+        if (this.worldwind.layers[l].enabled) {
+          this.worldwind.layers[l].enabled = false;
           this.redraw(redraw);
           // turn off menu icon
           for (let menuitem = 0; menuitem < this.menuLayers.length; menuitem++) {
@@ -50,9 +45,7 @@ export class WorldwindComponent {
         }
         else {
           // turn on layer
-          this.worldwind.removeLayer(this.layers[l].layer);
-          this.layers[l].layer.enabled = true;
-          this.worldwind.addLayer(this.layers[l].layer);
+          this.worldwind.layers[l].enabled = true;
           this.redraw(redraw);
           // turn on menu icon
           for (let menuitem = 0; menuitem < this.menuLayers.length; menuitem++) {
@@ -72,16 +65,13 @@ export class WorldwindComponent {
   }
 
   /**
-   * Add Worldwind Layer. 
-   * Optional: redraw, defaults: true
-   *          timeData, defaults:null
-   *          overwrite, defaults: false
+   * Adds worldwind layer and menu item
    */
-  public addLayer(layer: any, timeData?: any, overwrite = false, redraw = true) {
+  public addLayer(layer: any, overwrite = false, redraw = true) {
     let exists = false;
     if (!overwrite) {
-      for (let i = 0; i < this.layers.length; i++) {
-        if (layer.displayName === this.layers[i].layer.displayName) {
+      for (let i = 0; i < this.worldwind.layers.length; i++) {
+        if (layer.displayName === this.worldwind.layers[i].displayName) {
           return;
         }
       }
@@ -89,7 +79,6 @@ export class WorldwindComponent {
     if (!exists) {
       let enabled = layer.enabled;
       this.worldwind.addLayer(layer);
-      this.layers.push({ layer });
       this.redraw(redraw);
       for (let menuitem = 0; menuitem < this.menuLayers.length; menuitem++) {
         if (this.menuLayers[menuitem].label == 'Layers') {
@@ -108,12 +97,11 @@ export class WorldwindComponent {
 
   /**
    * remove layer by name
-   * Optional: redraw, defaults: true
    */
   public removeLayer(name: string, redraw = true) {
-    for (let l = 0; l < this.layers.length; l++) {
-      if (name === this.layers[l].layer.displayName) {
-        this.worldwind.removeLayer(this.layers[l].layer);
+    for (let l = 0; l < this.worldwind.layers.length; l++) {
+      if (name === this.worldwind.layers[l].displayName) {
+        this.worldwind.removeLayer(this.worldwind.layers[l]);
         this.redraw(redraw);
         for (let menuitem = 0; menuitem < this.menuLayers.length; menuitem++) {
           if (this.menuLayers[menuitem].label == 'Layers') {
@@ -132,7 +120,7 @@ export class WorldwindComponent {
   /**
    * private redraw 
    * control is exposed on per function basis via optional param(s)
-   * keeps common call interface intenally for worldwind
+   * keeps common call interface intenally for mulitple worldwind operations
    */
   private redraw(redraw: boolean) {
     if (redraw) {
@@ -275,6 +263,7 @@ export class WorldwindComponent {
                 let polygon = new WorldWind.Polygon(boundaries, null);
                 polygon.altitudeMode = WorldWind.ABSOLUTE;
                 polygon.extrude = true; // extrude the polygon edges to the ground
+                polygon.userProperties = { name: "UniquelyNamedPolygon", time: "12:00am" };
 
                 let polygonAttributes = new WorldWind.ShapeAttributes(null);
                 polygonAttributes.drawInterior = true;
@@ -298,7 +287,15 @@ export class WorldwindComponent {
             {
               label: 'BingAerial',
               command: (event) => {
-                this.addLayer(new WorldWind.BingAerialWithLabelsLayer(null));
+                //this.addLayer(new WorldWind.BingAerialWithLabelsLayer(null));
+                for (let i = 0; i < this.worldwind.layers.length; i++) {
+                  if ("Polygons" === this.worldwind.layers[i].displayName) {
+                    for (let p = 0; p < this.worldwind.layers[i].renderables.length; p++) {
+                      console.log(this.worldwind.layers[i].renderables[p].userProperties.name);
+                      return;
+                    }
+                  }
+                }
               }
             },
             {
@@ -435,8 +432,8 @@ export class WorldwindComponent {
       }
     ];
 
-    // add default set of layers
-    this.layers = [
+    // default set of layers
+    let layers = [
       { layer: new WorldWind.BMNGLayer() },
       { layer: new WorldWind.BMNGOneImageLayer() },
       { layer: new WorldWind.BMNGLandsatLayer() },
@@ -446,15 +443,15 @@ export class WorldwindComponent {
     ];
 
     // init layers info
-    for (let l = 0; l < this.layers.length; l++) {
-      if ("Blue Marble Image" === this.layers[l].layer.displayName
-        || "Coordinates" === this.layers[l].layer.displayName
-        || "View Controls" === this.layers[l].layer.displayName) {
-        this.layers[l].layer.enabled = true;
+    for (let l = 0; l < layers.length; l++) {
+      if ("Blue Marble Image" === layers[l].layer.displayName
+        || "Coordinates" === layers[l].layer.displayName
+        || "View Controls" === layers[l].layer.displayName) {
+        layers[l].layer.enabled = true;
       } else {
-        this.layers[l].layer.enabled = false;
+        layers[l].layer.enabled = false;
       }
-      wwd.addLayer(this.layers[l].layer);
+      wwd.addLayer(layers[l].layer);
     }
 
     // Configure the logging level.

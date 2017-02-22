@@ -2,7 +2,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { HttpModule } from '@angular/http';
-import { MenubarModule, MenuModule, MessagesModule, GrowlModule, InputTextModule, DialogModule, BlockUIModule, ButtonModule } from 'primeng/primeng';
+import { MenubarModule, MenuModule, MessagesModule, GrowlModule, InputTextModule, DialogModule, ButtonModule } from 'primeng/primeng';
 import { RouterModule, Routes } from '@angular/router';
 
 import { AppComponent } from './app.component';
@@ -19,7 +19,6 @@ const appRoutes: Routes = [
     WorldwindComponent 
   ],
   imports: [
-    BlockUIModule,
     ButtonModule,
     DialogModule,
     InputTextModule,
