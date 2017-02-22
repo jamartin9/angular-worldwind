@@ -287,15 +287,7 @@ export class WorldwindComponent {
             {
               label: 'BingAerial',
               command: (event) => {
-                //this.addLayer(new WorldWind.BingAerialWithLabelsLayer(null));
-                for (let i = 0; i < this.worldwind.layers.length; i++) {
-                  if ("Polygons" === this.worldwind.layers[i].displayName) {
-                    for (let p = 0; p < this.worldwind.layers[i].renderables.length; p++) {
-                      console.log(this.worldwind.layers[i].renderables[p].userProperties.name);
-                      return;
-                    }
-                  }
-                }
+                this.addLayer(new WorldWind.BingAerialWithLabelsLayer(null));
               }
             },
             {

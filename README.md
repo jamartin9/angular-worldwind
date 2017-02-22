@@ -50,7 +50,7 @@ To get more help on the `angular-cli` use `ng help` or go check out the [Angular
 
 ## Goals
 
-Reuseable WorldWindWeb Angular 2+ component with automatic CI of the latest libraries and tests
+Reuseable WorldWindWeb Angular 2+ component with mobile support
 
 Provide:
 1. Worldwind layer management along with time data about the layer ( ie when shapes occurened )
