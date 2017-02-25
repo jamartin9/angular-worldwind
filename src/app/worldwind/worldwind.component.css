@@ -3,7 +3,7 @@
     height: 90%;
     width: 100%;
     font-family: FontAwesome;
-    background:#000 url('assets/stars.png') repeat top center;
+    background:#000 url('../../assets/stars.png') repeat top center;
     z-index:0;
     padding: 0px;
     margin: 0px;

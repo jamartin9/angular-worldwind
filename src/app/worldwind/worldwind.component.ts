@@ -1,5 +1,6 @@
 import { Component, OnInit, ViewChild, ElementRef, ChangeDetectionStrategy } from '@angular/core';
 import { MenuItem, Message } from 'primeng/primeng';
+import { environment } from '../../environments/environment';
 
 // TODO: need typings
 declare let WorldWind: any;
@@ -72,7 +73,6 @@ export class WorldwindComponent {
     if (!this.worldwind) {
       this.makewwd();
     }
-    let exists = false;
     if (!overwrite) {
       for (let i = 0; i < this.worldwind.layers.length; i++) {
         if (layer.displayName === this.worldwind.layers[i].displayName) {
@@ -80,23 +80,22 @@ export class WorldwindComponent {
         }
       }
     }
-    if (!exists) {
-      let enabled = layer.enabled;
-      this.worldwind.addLayer(layer);
-      this.redraw(redraw);
-      for (let menuitem = 0; menuitem < this.menuLayers.length; menuitem++) {
-        if (this.menuLayers[menuitem].label == 'Layers') {
-          this.menuLayers[menuitem].items.push({
-            label: layer.displayName,
-            icon: 'fa-toggle-on',
-            command: (event) => {
-              this.toggleLayer(event.item.label);
-            }
-          });
-          return;
-        }
+    let enabled = layer.enabled;
+    this.worldwind.addLayer(layer);
+    this.redraw(redraw);
+    for (let menuitem = 0; menuitem < this.menuLayers.length; menuitem++) {
+      if (this.menuLayers[menuitem].label == 'Layers') {
+        this.menuLayers[menuitem].items.push({
+          label: layer.displayName,
+          icon: 'fa-toggle-on',
+          command: (event) => {
+            this.toggleLayer(event.item.label);
+          }
+        });
+        return;
       }
     }
+
   }
 
   /**
@@ -150,8 +149,9 @@ export class WorldwindComponent {
     }
   }
 
-  public makewwd() {
-    WorldWind.configuration.baseUrl = '';
+  private makewwd() {
+    //WorldWind.Logger.setLoggingLevel(WorldWind.Logger.LEVEL_WARNING);
+    WorldWind.configuration.baseUrl = environment.worldwindconfigurl;
     // create worldwind
     let wwd = new WorldWind.WorldWindow('canvas');
     this.worldwind = wwd;
@@ -235,11 +235,6 @@ export class WorldwindComponent {
   }
 
   ngOnInit() {
-    // TODO: assign to env let to be configurable from cli 
-    // Configure the logging level.
-    //WorldWind.Logger.setLoggingLevel(WorldWind.Logger.LEVEL_WARNING);
-
-
     this.menuLayers = [
       {
         label: 'Layers',
@@ -354,7 +349,7 @@ export class WorldwindComponent {
             }
           ]
         },
-        // default layers
+          // default layers
 
         ]
       },
