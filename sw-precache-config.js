@@ -6,9 +6,14 @@ module.exports = {
     'public/index.html',
     'public/**.js',
     'public/**.css',
-    'public/assets/worldwindlib.js',
-    'public/assets/stars.png',
-    'public/assets/twinkling.png',
+    'public/**.ico',
+    'public/**.gif',
+    'public/**.svg',
+    'public/**.ttf',
+    'public/**.eot',
+    'public/**.woff',
+    'public/**.woff2',
+    'public/assets/**.png',
     'public/images/**.png',
     'public/images/**.jpg',
     'public/images/**.svg',
@@ -20,12 +25,6 @@ module.exports = {
     'public/images/view/**.png',
     'public/images/view/**.jpg',
     'public/images/view/**.jpeg', 
-    'public/images/view/**.svg', 
-    'public/favicon.ico',
-    'public/**.svg',
-    'public/**.ttf',
-    'public/**.eot',
-    'public/**.woff',
-    'public/**.woff2'
+    'public/images/view/**.svg'
   ]
 };

@@ -4,13 +4,14 @@
   <meta charset="utf-8">
   <title>AngularWorldwind</title>
   <base href="/">
-
+  <meta name="theme-color" content="#000000">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link rel="manifest" href="manifest.webapp">
 </head>
 <script type="text/javascript">
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/service-worker.js').then(function(registration) {
+    navigator.serviceWorker.register('service-worker.js').then(function(registration) {
       console.log('Service Worker registered');
     }).catch(function(err) {
       console.log('Service Worker registration failed: ', err);

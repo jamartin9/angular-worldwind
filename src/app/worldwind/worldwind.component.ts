@@ -8,13 +8,13 @@ declare let WorldWind: any;
   selector: 'app-worldwind',
   templateUrl: './worldwind.component.html',
   styleUrls: ['./worldwind.component.css'],
-  changeDetection:ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class WorldwindComponent {
   @ViewChild('canvas') canvas: ElementRef;
   private displayTextInput: boolean = false;
   private nameInput: string;
-  private worldwind: any;
+  private worldwind: any = null;
   private msgs: Message[] = [];
   private menuLayers: MenuItem[];
   constructor() { }
@@ -69,6 +69,9 @@ export class WorldwindComponent {
    * Adds worldwind layer and menu item
    */
   public addLayer(layer: any, overwrite = false, redraw = true) {
+    if (!this.worldwind) {
+      this.makewwd();
+    }
     let exists = false;
     if (!overwrite) {
       for (let i = 0; i < this.worldwind.layers.length; i++) {
@@ -147,10 +150,8 @@ export class WorldwindComponent {
     }
   }
 
-  ngOnInit() {
-    // TODO: assign to env let to be configurable from cli 
+  public makewwd() {
     WorldWind.configuration.baseUrl = '';
-
     // create worldwind
     let wwd = new WorldWind.WorldWindow('canvas');
     this.worldwind = wwd;
@@ -231,6 +232,14 @@ export class WorldwindComponent {
     // Listen for taps on mobile devices and highlight the placemarks that the user taps.
     let tapRecognizer = new WorldWind.TapRecognizer(wwd, handlePick);
 
+  }
+
+  ngOnInit() {
+    // TODO: assign to env let to be configurable from cli 
+    // Configure the logging level.
+    //WorldWind.Logger.setLoggingLevel(WorldWind.Logger.LEVEL_WARNING);
+
+
     this.menuLayers = [
       {
         label: 'Layers',
@@ -283,7 +292,7 @@ export class WorldwindComponent {
                 let location = new WorldWind.Location(39, -84);
                 let size = 500;
                 let meters = size * 1000;
-                let circle = new WorldWind.SurfaceEllipse(location, meters, meters,0, polygonAttributes);
+                let circle = new WorldWind.SurfaceEllipse(location, meters, meters, 0, polygonAttributes);
                 console.log(circle.computeBoundaries(this.worldwind));
                 circle.highlightAttributes = highlightAttributes;
                 polygonsLayer.addRenderable(circle);
@@ -297,6 +306,45 @@ export class WorldwindComponent {
               }
             },
             {
+              label: 'Blue Marble',
+              command: (event) => {
+                this.addLayer(new WorldWind.BMNGLayer());
+              }
+            },
+            {
+              label: 'Blue Marble Image',
+              command: (event) => {
+                this.addLayer(new WorldWind.BMNGOneImageLayer());
+              }
+            },
+            {
+              label: 'Blue Marble & Landsat',
+              command: (event) => {
+                this.addLayer(new WorldWind.BMNGLandsatLayer());
+              }
+            },
+            {
+              label: 'Compass',
+              icon: 'fa-compass',
+              command: (event) => {
+                this.addLayer(new WorldWind.CompassLayer());
+              }
+            },
+            {
+              label: 'Coordinates',
+              icon: 'fa-cog fa-spin fa-fw',
+              command: (event) => {
+                this.addLayer(new WorldWind.CoordinatesDisplayLayer(this.worldwind));
+              }
+            },
+            {
+              label: 'View Controls',
+              icon: 'fa-cog fa-spin fa-fw',
+              command: (event) => {
+                this.addLayer(new WorldWind.ViewControlsLayer(this.worldwind));
+              }
+            },
+            {
               label: 'Other',
               command: (event) => {
                 // show user input for name
@@ -307,48 +355,7 @@ export class WorldwindComponent {
           ]
         },
         // default layers
-        {
-          label: 'Blue Marble',
-          icon: 'fa-toggle-off',
-          command: (event) => {
-            this.toggleLayer(event.item.label);
-          }
-        },
-        {
-          label: 'Blue Marble Image',
-          icon: 'fa-toggle-on',
-          command: (event) => {
-            this.toggleLayer(event.item.label);
-          }
-        },
-        {
-          label: 'Blue Marble & Landsat',
-          icon: 'fa-toggle-off',
-          command: (event) => {
-            this.toggleLayer(event.item.label);
-          }
-        },
-        {
-          label: 'Compass',
-          icon: 'fa-compass',
-          command: (event) => {
-            this.toggleLayer(event.item.label);
-          }
-        },
-        {
-          label: 'Coordinates',
-          icon: 'fa-cog fa-spin fa-fw',
-          command: (event) => {
-            this.toggleLayer(event.item.label);
-          }
-        },
-        {
-          label: 'View Controls',
-          icon: 'fa-cog fa-spin fa-fw',
-          command: (event) => {
-            this.toggleLayer(event.item.label);
-          }
-        }
+
         ]
       },
       {
@@ -419,7 +426,7 @@ export class WorldwindComponent {
           surfacepolygonAttributes.drawInterior = true;
           surfacepolygonAttributes.drawOutline = true;
           surfacepolygonAttributes.outlineColor = WorldWind.Color.BLUE;
-          surfacepolygonAttributes.interiorColor =  new WorldWind.Color(0, 1, 1, 0.5);
+          surfacepolygonAttributes.interiorColor = new WorldWind.Color(0, 1, 1, 0.5);
           surfacepolygonAttributes.applyLighting = false;
           surfacepolygonAttributes.drawVerticals = true;
 
@@ -459,31 +466,6 @@ export class WorldwindComponent {
         icon: 'fa-minus'
       }
     ];
-
-    // default set of layers
-    let layers = [
-      { layer: new WorldWind.BMNGLayer() },
-      { layer: new WorldWind.BMNGOneImageLayer() },
-      { layer: new WorldWind.BMNGLandsatLayer() },
-      { layer: new WorldWind.CompassLayer() },
-      { layer: new WorldWind.CoordinatesDisplayLayer(this.worldwind) },
-      { layer: new WorldWind.ViewControlsLayer(this.worldwind) }
-    ];
-
-    // init layers info
-    for (let l = 0; l < layers.length; l++) {
-      if ("Blue Marble Image" === layers[l].layer.displayName
-        || "Coordinates" === layers[l].layer.displayName
-        || "View Controls" === layers[l].layer.displayName) {
-        layers[l].layer.enabled = true;
-      } else {
-        layers[l].layer.enabled = false;
-      }
-      wwd.addLayer(layers[l].layer);
-    }
-
-    // Configure the logging level.
-    WorldWind.Logger.setLoggingLevel(WorldWind.Logger.LEVEL_WARNING);
 
   }
 
