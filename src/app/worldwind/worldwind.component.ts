@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef, ChangeDetectionStrategy } from '@angular/core';
 import { MenuItem, Message } from 'primeng/primeng';
 
 // TODO: need typings
@@ -7,7 +7,8 @@ declare let WorldWind: any;
 @Component({
   selector: 'app-worldwind',
   templateUrl: './worldwind.component.html',
-  styleUrls: ['./worldwind.component.css']
+  styleUrls: ['./worldwind.component.css'],
+  changeDetection:ChangeDetectionStrategy.OnPush
 })
 export class WorldwindComponent {
   @ViewChild('canvas') canvas: ElementRef;
