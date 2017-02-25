@@ -242,12 +242,10 @@ export class WorldwindComponent {
             {
               label: 'KML',
               command: () => {
-                // Create a layer to hold the polygons.
                 let polygonsLayer = new WorldWind.RenderableLayer();
                 polygonsLayer.displayName = "Polygons";
                 this.addLayer(polygonsLayer);
 
-                // Define an outer and an inner boundary to make a polygon with a hole.
                 let boundaries = [];
                 boundaries[0] = []; // outer boundary
                 boundaries[0].push(new WorldWind.Position(40, -100, 1e5));
@@ -274,7 +272,6 @@ export class WorldwindComponent {
                 polygonAttributes.applyLighting = true;
                 polygon.attributes = polygonAttributes;
 
-                // Create and assign the polygon's highlight attributes.
                 let highlightAttributes = new WorldWind.ShapeAttributes(polygonAttributes);
                 highlightAttributes.outlineColor = WorldWind.Color.RED;
                 highlightAttributes.interiorColor = new WorldWind.Color(1, 1, 1, 0.5);
@@ -282,6 +279,14 @@ export class WorldwindComponent {
 
                 // Add the polygon to the layer and the layer to the World Window's layer list.
                 polygonsLayer.addRenderable(polygon);
+                let location = new WorldWind.Location(39, -84);
+                let size = 500;
+                let meters = size * 1000;
+                let circle = new WorldWind.SurfaceEllipse(location, meters, meters,0, polygonAttributes);
+                console.log(circle.computeBoundaries(this.worldwind));
+                circle.highlightAttributes = highlightAttributes;
+                polygonsLayer.addRenderable(circle);
+
               }
             },
             {
@@ -404,7 +409,37 @@ export class WorldwindComponent {
       },
       {
         // TODO: polygon
-        icon: 'fa-dot-circle-o'
+        icon: 'fa-dot-circle-o',
+        command: (event) => {
+          let surfacepolygonsLayer = new WorldWind.RenderableLayer();
+          surfacepolygonsLayer.displayName = "SurfacePolygons";
+          this.addLayer(surfacepolygonsLayer);
+          let surfacepolygonAttributes = new WorldWind.ShapeAttributes(null);
+          surfacepolygonAttributes.drawInterior = true;
+          surfacepolygonAttributes.drawOutline = true;
+          surfacepolygonAttributes.outlineColor = WorldWind.Color.BLUE;
+          surfacepolygonAttributes.interiorColor =  new WorldWind.Color(0, 1, 1, 0.5);
+          surfacepolygonAttributes.applyLighting = false;
+          surfacepolygonAttributes.drawVerticals = true;
+
+          let highlightAttributes = new WorldWind.ShapeAttributes(surfacepolygonAttributes);
+          highlightAttributes.outlineColor = WorldWind.Color.RED;
+          highlightAttributes.interiorColor = new WorldWind.Color(1, 1, 1, 0.5);
+
+          var surfacepoly = [];
+          surfacepoly[0] = []; // outer boundary
+          surfacepoly[0].push(new WorldWind.Location(20, -70));
+          surfacepoly[0].push(new WorldWind.Location(25, -80));
+          surfacepoly[0].push(new WorldWind.Location(20, -90));
+          surfacepoly[1] = []; // inner boundary
+          surfacepoly[1].push(new WorldWind.Location(21, -73));
+          surfacepoly[1].push(new WorldWind.Location(24, -80));
+          surfacepoly[1].push(new WorldWind.Location(21, -87));
+
+          let shape = new WorldWind.SurfacePolygon(surfacepoly, surfacepolygonAttributes);
+          shape.highlightAttributes = highlightAttributes;
+          surfacepolygonsLayer.addRenderable(shape);
+        }
       },
       {
         // TODO: cut
