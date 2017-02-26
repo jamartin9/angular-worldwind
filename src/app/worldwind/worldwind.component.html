@@ -2,7 +2,7 @@
 <canvas id="canvas" class="animation" #canvas >   
 </canvas>
 <p-growl [value]="msgs"></p-growl>
-<p-dialog header="LayerName" [(visible)]="displayTextInput" modal=true>
-    <input type="text" [(ngModel)]="nameInput" pInputText />
-    <button pButton label="Save" icon="fa-check" (click)="toggleDialog()" iconPos="left"></button>
+<p-dialog header="LayerName" [(visible)]="displayDialog" modal=true>
+    <input type="text" [(ngModel)]="nameInput" *ngIf="displayTextInput" pInputText />
+    <button pButton label="Save" icon="fa-check" (click)="toggleDialog(); toggleTextInput();" iconPos="left"></button>
 </p-dialog>

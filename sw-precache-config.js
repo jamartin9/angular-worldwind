@@ -1,11 +1,13 @@
 module.exports = {
   navigateFallback: '/index.html',
   stripPrefix: 'public',
- // handleFetch: true,
- // skipWaiting: true,
+  replacePrefix:'angular-worldwind',
+  handleFetch: true,
+  skipWaiting: true,
   root: 'public/',
   staticFileGlobs: [
     'public/index.html',
+    'public/**.png',
     'public/**.js',
     'public/**.css',
     'public/**.ico',

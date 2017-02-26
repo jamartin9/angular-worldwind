@@ -14,6 +14,8 @@ declare let WorldWind: any;
 export class WorldwindComponent {
   @ViewChild('canvas') canvas: ElementRef;
   private displayTextInput: boolean = false;
+  private displayDialog: boolean = false;
+  private deleteLayer: boolean = false;
   private nameInput: string;
   private worldwind: any = null;
   private msgs: Message[] = [];
@@ -27,40 +29,34 @@ export class WorldwindComponent {
    * Toggles layer by name
    */
   public toggleLayer(name: string, redraw = true) {
-    for (let l = 0; l < this.worldwind.layers.length; l++) {
-      if (name === this.worldwind.layers[l].displayName) {
-        if (this.worldwind.layers[l].enabled) {
-          this.worldwind.layers[l].enabled = false;
-          this.redraw(redraw);
-          // turn off menu icon
-          for (let menuitem = 0; menuitem < this.menuLayers.length; menuitem++) {
-            if (this.menuLayers[menuitem].label == 'Layers') {
-              for (let item = 0; item < this.menuLayers[menuitem].items.length; item++) {
-                if (name === this.menuLayers[menuitem].items[item].label) {
-                  this.menuLayers[menuitem].items[item].icon = 'fa-toggle-off';
-                  return;
-                }
-              }
-            }
-
+    // toggle worldwind layer
+    if (this.worldwind) {
+      for (let l = 0; l < this.worldwind.layers.length; l++) {
+        if (name === this.worldwind.layers[l].displayName) {
+          let wasEnabled = false;
+          if (this.worldwind.layers[l].enabled) {
+            wasEnabled = true;
+            this.worldwind.layers[l].enabled = false;
           }
-        }
-        else {
-          // turn on layer
-          this.worldwind.layers[l].enabled = true;
-          this.redraw(redraw);
-          // turn on menu icon
+          else {
+            this.worldwind.layers[l].enabled = true;
+          }
+          // toggle menu icon
           for (let menuitem = 0; menuitem < this.menuLayers.length; menuitem++) {
             if (this.menuLayers[menuitem].label == 'Layers') {
               for (let item = 0; item < this.menuLayers[menuitem].items.length; item++) {
                 if (name === this.menuLayers[menuitem].items[item].label) {
-                  this.menuLayers[menuitem].items[item].icon = 'fa-toggle-on';
+                  if (wasEnabled) {
+                    this.menuLayers[menuitem].items[item].icon = 'fa-toggle-off';
+                  } else {
+                    this.menuLayers[menuitem].items[item].icon = 'fa-toggle-on';
+                  }
+                  this.redraw(redraw);
                   return;
                 }
               }
             }
           }
-
         }
       }
     }
@@ -69,7 +65,7 @@ export class WorldwindComponent {
   /**
    * Adds worldwind layer and menu item
    */
-  public addLayer(layer: any, overwrite = false, redraw = true) {
+  public addLayer(layer: any, redraw = true, overwrite = false, ) {
     if (!this.worldwind) {
       this.makewwd();
     }
@@ -102,16 +98,18 @@ export class WorldwindComponent {
    * remove layer by name
    */
   public removeLayer(name: string, redraw = true) {
-    for (let l = 0; l < this.worldwind.layers.length; l++) {
-      if (name === this.worldwind.layers[l].displayName) {
-        this.worldwind.removeLayer(this.worldwind.layers[l]);
-        this.redraw(redraw);
-        for (let menuitem = 0; menuitem < this.menuLayers.length; menuitem++) {
-          if (this.menuLayers[menuitem].label == 'Layers') {
-            for (let item = 0; item < this.menuLayers[menuitem].items.length; item++) {
-              if (name === this.menuLayers[menuitem].items[item].label) {
-                this.menuLayers[menuitem].items.splice(item, 1);
-                return;
+    if (this.worldwind) {
+      for (let l = 0; l < this.worldwind.layers.length; l++) {
+        if (name === this.worldwind.layers[l].displayName) {
+          this.worldwind.removeLayer(this.worldwind.layers[l]);
+          this.redraw(redraw);
+          for (let menuitem = 0; menuitem < this.menuLayers.length; menuitem++) {
+            if (this.menuLayers[menuitem].label == 'Layers') {
+              for (let item = 0; item < this.menuLayers[menuitem].items.length; item++) {
+                if (name === this.menuLayers[menuitem].items[item].label) {
+                  this.menuLayers[menuitem].items.splice(item, 1);
+                  return;
+                }
               }
             }
           }
@@ -132,23 +130,45 @@ export class WorldwindComponent {
   }
 
   /**
-   * Toggels dialog for text input
-   * Adds Worldwind layer with name from input
+   * Get input from text in dialog and toggles display
    */
-  private toggleDialog() {
+  private toggleTextInput() {
     if (this.displayTextInput) {
       this.displayTextInput = false;
       if (this.nameInput) {
-        let userLayer = new WorldWind.RenderableLayer();
-        userLayer.displayName = this.nameInput;
-        this.addLayer(userLayer);
+        if (this.deleteLayer) {
+          this.deleteLayer = false;
+          this.removeLayer(this.nameInput);
+          this.addMessage({ severity: 'error', summary: 'deleteLayer Message', detail: '!' });
+        } else {
+          let userLayer = new WorldWind.RenderableLayer();
+          userLayer.displayName = this.nameInput;
+          this.addLayer(userLayer);
+          this.addMessage({ severity: 'success', summary: 'Save Message', detail: '!' });
+        }
         this.nameInput = "";
       }
     } else {
       this.displayTextInput = true;
     }
+
   }
 
+  /**
+   * Toggels dialogs
+   */
+  private toggleDialog() {
+    // turn off dialog
+    if (this.displayDialog) {
+      this.displayDialog = false;
+    } else {
+      this.displayDialog = true;
+    }
+  }
+
+  /**
+   * creates worldwind viewer and config
+   */
   private makewwd() {
     //WorldWind.Logger.setLoggingLevel(WorldWind.Logger.LEVEL_WARNING);
     WorldWind.configuration.baseUrl = environment.worldwindconfigurl;
@@ -234,6 +254,7 @@ export class WorldwindComponent {
 
   }
 
+  // init menu items
   ngOnInit() {
     this.menuLayers = [
       {
@@ -344,7 +365,7 @@ export class WorldwindComponent {
               command: (event) => {
                 // show user input for name
                 this.toggleDialog();
-
+                this.toggleTextInput();
               }
             }
           ]
@@ -357,11 +378,22 @@ export class WorldwindComponent {
         label: 'Edit',
         icon: 'fa-edit',
         items: [
-          // TODO: undo/redo/delete/save
+          // TODO: undo/redo/deleteLayer/save
           { label: 'Undo', icon: 'fa-mail-forward', command: (event) => { this.addMessage({ severity: 'warn', summary: 'Undo Message', detail: '!' }); } },
           { label: 'Redo', icon: 'fa-mail-reply', command: (event) => { this.addMessage({ severity: 'info', summary: 'Redo Message', detail: '!' }); } },
-          { label: 'Delete', icon: 'fa-times-circle', command: (event) => { this.addMessage({ severity: 'error', summary: 'Delete Message', detail: '!' }); } },
-          { label: 'Save', icon: 'fa-floppy-o', command: (event) => { this.addMessage({ severity: 'success', summary: 'Save Message', detail: '!' }); } }
+          {
+            label: 'Delete', icon: 'fa-times-circle', command: (event) => {
+              this.deleteLayer = true;
+              this.displayTextInput = true;
+              this.toggleDialog();
+            }
+          },
+          {
+            label: 'Save', icon: 'fa-floppy-o', command: (event) => {
+              this.displayTextInput = true;
+              this.toggleDialog();
+            }
+          }
         ]
       },
       {
