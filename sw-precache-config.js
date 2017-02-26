@@ -1,8 +1,8 @@
 module.exports = {
   navigateFallback: '/index.html',
   stripPrefix: 'public',
-  handleFetch: true,
-  skipWaiting: true,
+ // handleFetch: true,
+ // skipWaiting: true,
   root: 'public/',
   staticFileGlobs: [
     'public/index.html',
