@@ -4,7 +4,7 @@ pages:
   stage: deploy
   script:
   - npm install
-  - node ./node_modules/@angular/cli/bin/ng build -aot -prod -e prod -sm false --base-href="https://spaz.gitlab.io/angular-worldwind/"
+  - node ./node_modules/@angular/cli/bin/ng build -aot -prod -e prod -sm false --base-href="https://spaz.gitlab.io/angular-worldwind/" --extract-css false 
   - npm run sw
   artifacts:
     paths:
